@@ -1,5 +1,5 @@
-import { ICreatePostBody } from '../types/posts';
-import Post from '../models/post.model';
+import { ICreatePostBody } from '../types/user';
+import Post from '../models/user.model';
 import { DocumentedObject } from '../types/common';
 import FileService from './file.service';
 

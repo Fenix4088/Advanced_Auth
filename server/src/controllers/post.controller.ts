@@ -1,6 +1,6 @@
 import { TRequest } from '../types/common';
 import { Response } from 'express';
-import { ICreatePostBody, IGetPosts } from '../types/posts';
+import { ICreatePostBody, IGetPosts } from '../types/user';
 import PostServices from '../services/post.services';
 
 interface IPostController {
