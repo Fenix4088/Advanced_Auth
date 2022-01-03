@@ -3,16 +3,20 @@ import express from 'express';
 import router from './src/routers/post.router';
 import mongoose from 'mongoose';
 import fileupload from 'express-fileupload';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 dotenv.config();
 
 const PORT: number = (process.env.PORT && +process.env.PORT) || 5000;
-const DB: string = `mongodb+srv://fenix:${process.env.PASS}@cluster0.1kxrh.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+const DB: string = `mongodb+srv://fenix:${process.env.PASS}@cluster0.yl9nm.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
 const app = express();
 app.use(express.static('static'));
 app.use(express.json());
-app.use(fileupload({}))
+app.use(cookieParser());
+app.use(fileupload({}));
+app.use(cors());
 
 app.use('/api', router);
 
