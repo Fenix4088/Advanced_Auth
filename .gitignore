@@ -1,0 +1,16 @@
+client/node_modules
+server/node_modules
+client/.idea/
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+client/node_modules
+client/.pnp
+.pnp.js
+
+# testing
+client/coverage
+
+# production
+/build
