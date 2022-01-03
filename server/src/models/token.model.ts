@@ -2,7 +2,7 @@ import { model, Schema } from "mongoose";
 import { ITokenModel } from "../types/token.type";
 
 const Token = new Schema<ITokenModel>({
-      user: {type: Schema.Types.ObjectId, required: true},
+      user: {type: Schema.Types.ObjectId, required: true, ref: 'User'},
       refreshToken: {type: String, required: true}
 });
 
