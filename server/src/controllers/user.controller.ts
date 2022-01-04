@@ -17,13 +17,11 @@ class UserController implements IUserController {
 
       public registration = async (req: TRequest<IRegistrationPayload, {}>, res: Response, next: NextFunction) => {
             try {
-                  debugger;
                   const {email, password} = req.body;
                   await UserService.registration(email, password);
 
                   return res.status(200).json({message: `User ${email} created!`});
-            } catch (error) {
-                  //@ts-ignore
+            } catch (error: any) {
                   return res.status(400).json({errorMessage: error.message});
             }
       }
