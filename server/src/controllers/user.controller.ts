@@ -1,6 +1,8 @@
 import { NextFunction } from "express-serve-static-core";
 import { TRequest } from "../types/common";
 import {Response} from 'express';
+import { IRegistrationPayload } from "../types/user.type";
+import UserService from '../services/user.service';
 
 interface IUserController {
       registration(req: TRequest<{}, {}>, res: Response, next: NextFunction): void;
@@ -13,11 +15,16 @@ interface IUserController {
 
 class UserController implements IUserController {
 
-      public registration = (req: TRequest<{}, {}>, res: Response, next: NextFunction) => {
+      public registration = async (req: TRequest<IRegistrationPayload, {}>, res: Response, next: NextFunction) => {
             try {
-                  
+                  debugger;
+                  const {email, password} = req.body;
+                  await UserService.registration(email, password);
+
+                  return res.status(200).json({message: `User ${email} created!`});
             } catch (error) {
-                  
+                  //@ts-ignore
+                  return res.status(400).json({errorMessage: error.message});
             }
       }
 

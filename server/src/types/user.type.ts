@@ -7,4 +7,6 @@ export interface IUserModel {
   activationLink: string;
 }
 
+export interface IRegistrationPayload extends Pick<IUserModel, 'email' | 'password'> {}
+
 
