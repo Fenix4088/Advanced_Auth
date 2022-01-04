@@ -1,21 +1,21 @@
-// import { Router } from 'express';
-// import PostController from '../controllers/post.controller';
 
-// const router = Router();
+import { Router } from "express";
 
-// enum PostsEndpoints {
-//   POST = '/posts',
-//   POST_WITH_ID = '/posts/:id',
-// }
+const router = Router();
 
-// router.post(`${PostsEndpoints.POST}`, (req, res) => PostController.create(req, res));
+enum ENDPOINTS  {
+      REGISTRATION = '/registration',
+      LOGIN = '/login',
+      LOGOUT = '/logout',
+      ACTIVATE_BY_LINK = '/activate/:link',
+      REFRESH = '/refresh',
+      USERS = '/users',
+}
+const {REGISTRATION, LOGIN, LOGOUT, ACTIVATE_BY_LINK, REFRESH, USERS} = ENDPOINTS;
 
-// router.get(`${PostsEndpoints.POST}`, (req, res) => PostController.getPosts(req, res));
-
-// router.get('/posts/:id', (req, res) => PostController.getPosts(req, res));
-
-// router.put(`${PostsEndpoints.POST}`, (req, res) => PostController.update(req, res));
-
-// router.delete(`${PostsEndpoints.POST}`, (req, res) => PostController.delete(req, res));
-
-// export default router;
+router.post(REGISTRATION);
+router.post(LOGIN);
+router.post(LOGOUT);
+router.get(ACTIVATE_BY_LINK);
+router.get(REFRESH);
+router.get(USERS);
