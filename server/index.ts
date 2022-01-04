@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import fileupload from 'express-fileupload';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import router from './src/routers/post.router';
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ app.use(cookieParser());
 app.use(fileupload({}));
 app.use(cors());
 
-// app.use('/api', router);
+app.use('/api', router);
 
 const startApp = async () => {
   try {
