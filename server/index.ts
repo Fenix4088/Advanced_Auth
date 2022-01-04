@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import fileupload from 'express-fileupload';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import router from './src/routers/post.router';
+import router from './src/routers/user.router';
 
 dotenv.config();
 
