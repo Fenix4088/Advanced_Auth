@@ -26,7 +26,7 @@ class UserService implements IUserService {
 
             const newUser = await UserModel.create({email, password: bcrypt.hashSync(password, 3), activationLink});
  
-            await MailService.sendActivationMail(email, 'link');
+            await MailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
 
             const userDto = new UserDto(newUser);
 
