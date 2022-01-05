@@ -18,9 +18,11 @@ class UserController implements IUserController {
       public registration = async (req: TRequest<IRegistrationPayload, {}>, res: Response, next: NextFunction) => {
             try {
                   const {email, password} = req.body;
-                  await UserService.registration(email, password);
+                  const userData = await UserService.registration(email, password);
 
-                  return res.status(200).json({message: `User ${email} created!`});
+                  res.cookie('refreshToken', userData.refreshToken, {maxAge: 30*24*60*60*1000, httpOnly: true});
+
+                  return res.status(200).json({message: `User ${email} created!`, data: userData});
             } catch (error: any) {
                   return res.status(400).json({errorMessage: error.message});
             }

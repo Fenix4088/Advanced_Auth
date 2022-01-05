@@ -9,4 +9,4 @@ const User: Schema = new Schema<IUserModel>({
   activationLink: {type: String},
 });
 
-export default mongoose.model<IUserModel>('Post', User);
+export default mongoose.model<IUserModel>('User', User);
