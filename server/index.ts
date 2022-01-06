@@ -18,11 +18,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(fileupload({}));
 app.use(cors());
+app.use('/api', router);
 
 //! Alwayse should be the lastone in server 'use' chain
-app.use(errorMiddleware)
+app.use(errorMiddleware);
 
-app.use('/api', router);
 
 const startApp = async () => {
   try {
