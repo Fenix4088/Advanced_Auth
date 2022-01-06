@@ -1,3 +1,4 @@
+import { RerquestExpressValidator } from './../types/common';
 import { IUserActivationReqParams } from './../types/user.type';
 import { NextFunction } from "express-serve-static-core";
 import { TRequest } from "../types/common";
@@ -5,6 +6,8 @@ import { Response } from 'express';
 import { IRegistrationPayload } from "../types/user.type";
 import UserService from '../services/user.service';
 import dotenv from 'dotenv';
+import { validationResult } from 'express-validator';
+import { ApiErrors } from '../exceptions/api.errors';
 
 dotenv.config();
 
@@ -19,8 +22,14 @@ interface IUserController {
 
 class UserController implements IUserController {
 
-      public registration = async (req: TRequest<{}, IRegistrationPayload, {}>, res: Response, next: NextFunction) => {
+      public registration = async (req: RerquestExpressValidator<IRegistrationPayload>, res: Response, next: NextFunction) => {
             try {
+                  const errors = validationResult(req);
+                  if(!errors.isEmpty()) {
+                        next(ApiErrors.BadRequest('Validation error', errors.array()));
+                  }
+                  
+
                   const {email, password} = req.body;
                   const userData = await UserService.registration(email, password);
 

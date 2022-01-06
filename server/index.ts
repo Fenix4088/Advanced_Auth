@@ -20,7 +20,7 @@ app.use(fileupload({}));
 app.use(cors());
 app.use('/api', router);
 
-//! Alwayse should be the lastone in server 'use' chain
+//! add custom error handler middleware as the last middleware
 app.use(errorMiddleware);
 
 

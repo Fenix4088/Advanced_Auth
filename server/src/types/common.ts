@@ -19,3 +19,5 @@ export type DocumentedObject<T> = Document<any, any, T> &
   T & {
     _id: Types.ObjectId;
   };
+
+  export type RerquestExpressValidator<Body = any> = Request<Record<string, any> | undefined, any, Body, Record<string, any> | undefined, Record<string, any>>
