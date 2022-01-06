@@ -1,7 +1,7 @@
 import { IUserActivationReqParams } from './../types/user.type';
 import { NextFunction } from "express-serve-static-core";
 import { TRequest } from "../types/common";
-import {Response} from 'express';
+import { Response } from 'express';
 import { IRegistrationPayload } from "../types/user.type";
 import UserService from '../services/user.service';
 import dotenv from 'dotenv';
@@ -28,7 +28,7 @@ class UserController implements IUserController {
 
                   return res.status(200).json({message: `User ${email} created!`, data: userData});
             } catch (error: any) {
-                  return res.status(400).json({errorMessage: error.message});
+                  next(error);
             }
       }
 
@@ -36,6 +36,7 @@ class UserController implements IUserController {
             try {
                   
             } catch (error) {
+                  next(error);
                   
             }
       }
@@ -44,6 +45,7 @@ class UserController implements IUserController {
             try {
                   
             } catch (error) {
+                  next(error);
                   
             }
       }
@@ -52,10 +54,11 @@ class UserController implements IUserController {
             try {
                   const { link } = req.params;
                   await UserService.activate(link);
-                  
+
                   return res.redirect(process.env.CLIENT_URL || '');
             } catch (error) {
-                  res.send(500).json({message: 'Activation error!'});
+                  next(error);
+
             }
       }
 
@@ -63,6 +66,7 @@ class UserController implements IUserController {
             try {
                   
             } catch (error) {
+                  next(error);
                   
             }
       }
@@ -71,6 +75,7 @@ class UserController implements IUserController {
             try {
                   return res.status(200).json({message: 'Server in work'});
             } catch (error) {
+                  next(error);
                   
             }
       }

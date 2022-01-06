@@ -1,3 +1,4 @@
+import { errorMiddleware } from './src/middleware/error.middleware';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
@@ -17,6 +18,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(fileupload({}));
 app.use(cors());
+
+//! Alwayse should be the lastone in server 'use' chain
+app.use(errorMiddleware)
 
 app.use('/api', router);
 

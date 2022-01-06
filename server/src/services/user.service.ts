@@ -5,6 +5,7 @@ import TokenService from './token.service';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { UserDto } from '../dtos/user.dto';
+import { ApiErrors } from '../exceptions/api.errors';
 
 interface IRegistrationReturn {
       accessToken: string;
@@ -21,7 +22,7 @@ class UserService implements IUserService {
       public registration = async (email: string, password: string)=> {
             const candidate = await UserModel.findOne({email});
 
-            if(candidate) throw new Error(`User ${email} already excisted!`);
+            if(candidate) throw ApiErrors.BadRequest(`User ${email} already excisted!`);
 
             const activationLink = await uuidv4();
 
@@ -45,7 +46,7 @@ class UserService implements IUserService {
       public activate = async (link: string) => {
             const user = await UserModel.findOne({activationLink: link});
 
-            if(!user) throw new Error('Invalid activation link');
+            if(!user) throw ApiErrors.BadRequest('Invalid activation link');
 
             user.isActivated = true;
 
