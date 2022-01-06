@@ -6,7 +6,7 @@ export interface TypedRequestBody<T = any> extends Request {
   body: T;
 }
 
-export type TRequest<ReqBody, ReqQuery, WithFile = false> = Request<{}, {}, ReqBody, ReqQuery> & WithFileType<WithFile>;
+export type TRequest<ReqParams, ReqBody, ReqQuery, WithFile = false> = Request<ReqParams, {}, ReqBody, ReqQuery> & WithFileType<WithFile>;
 
 //TODO: try to redaclare original FileArray type and set there a strict strings as a keys
 type WithFileType<C> = C extends true

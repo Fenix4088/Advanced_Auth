@@ -14,6 +14,7 @@ interface IRegistrationReturn {
 
 interface IUserService {
       registration(email: string, password: string): Promise<IRegistrationReturn>;
+      activate(link: string): void;
 }
 
 class UserService implements IUserService {
@@ -39,6 +40,16 @@ class UserService implements IUserService {
                   refreshToken,
                   user: userDto
             }
+      }
+
+      public activate = async (link: string) => {
+            const user = await UserModel.findOne({activationLink: link});
+
+            if(!user) throw new Error('Invalid activation link');
+
+            user.isActivated = true;
+
+            await user.save();
       }
 }
 
