@@ -15,6 +15,7 @@ interface IRegistrationReturn {
 
 interface IUserService {
       registration(email: string, password: string): Promise<IRegistrationReturn>;
+      login(email: string, password: string): any;
       activate(link: string): void;
 }
 
@@ -43,6 +44,17 @@ class UserService implements IUserService {
             }
       }
 
+      public login = async (email: string, password: string) => {
+            const userData = await UserModel.findOne({email});
+
+            if(!userData) {
+                  throw ApiErrors.BadRequest(`User: ${email} is not authorized`);
+            }
+
+            const isPassValid = bcrypt.compareSync(password, userData.password);
+
+      }
+
       public activate = async (link: string) => {
             const user = await UserModel.findOne({activationLink: link});
 
@@ -52,6 +64,7 @@ class UserService implements IUserService {
 
             await user.save();
       }
+
 }
 
 export default new UserService();

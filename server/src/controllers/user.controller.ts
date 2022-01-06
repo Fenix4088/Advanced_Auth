@@ -12,8 +12,8 @@ import { ApiErrors } from '../exceptions/api.errors';
 dotenv.config();
 
 interface IUserController {
-      registration(req: TRequest<{}, IRegistrationPayload, {}>, res: Response, next: NextFunction): void;
-      login(req: TRequest<{}, {}, {}>, res: Response, next: NextFunction): void;
+      registration(req: RerquestExpressValidator<IRegistrationPayload>, res: Response, next: NextFunction): void;
+      login(req: TRequest<{}, IRegistrationPayload, {}>, res: Response, next: NextFunction): void;
       logout(req: TRequest<{}, {}, {}>, res: Response, next: NextFunction): void;
       activate(req: TRequest<IUserActivationReqParams, {}, {}>, res: Response, next: NextFunction): void;
       refresh(req: TRequest<{}, {}, {}>, res: Response, next: NextFunction): void;
@@ -41,12 +41,14 @@ class UserController implements IUserController {
             }
       }
 
-      public login = (req: TRequest<{}, {}, {}>, res: Response, next: NextFunction) => {
+      public login = async (req: TRequest<{}, IRegistrationPayload, {}>, res: Response, next: NextFunction) => {
             try {
+                  const {email, password} = req.body;
+
+                  const userData = await UserService.login(email, password);
                   
             } catch (error) {
                   next(error);
-                  
             }
       }
 
