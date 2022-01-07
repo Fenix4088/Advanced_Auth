@@ -8,63 +8,71 @@ import { UserDto } from '../dtos/user.dto';
 import { ApiErrors } from '../exceptions/api.errors';
 
 interface IRegistrationReturn {
-      accessToken: string;
-      refreshToken: string;
-      user: IGenerateTokensPayload;
+  accessToken: string;
+  refreshToken: string;
+  user: IGenerateTokensPayload;
 }
 
 interface IUserService {
-      registration(email: string, password: string): Promise<IRegistrationReturn>;
-      login(email: string, password: string): any;
-      activate(link: string): void;
+  registration(email: string, password: string): Promise<IRegistrationReturn>;
+  login(email: string, password: string): Promise<IRegistrationReturn>;
+  activate(link: string): void;
 }
 
 class UserService implements IUserService {
-      public registration = async (email: string, password: string)=> {
-            const candidate = await UserModel.findOne({email});
+  public registration = async (email: string, password: string) => {
+    const candidate = await UserModel.findOne({ email });
 
-            if(candidate) throw ApiErrors.BadRequest(`User ${email} already excisted!`);
+    if (candidate) throw ApiErrors.BadRequest(`User ${email} already excisted!`);
 
-            const activationLink = await uuidv4();
+    const activationLink = await uuidv4();
 
-            const newUser = await UserModel.create({email, password: bcrypt.hashSync(password, 3), activationLink});
- 
-            await MailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
+    const newUser = await UserModel.create({ email, password: bcrypt.hashSync(password, 3), activationLink });
 
-            const userDto = new UserDto(newUser);
+    await MailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
 
-            const {accessToken, refreshToken} = TokenService.generateTokens({...userDto});
+    const userDto = new UserDto(newUser);
 
-            await TokenService.saveToken(userDto.id, refreshToken);
+    const tokens = TokenService.generateTokens({ ...userDto });
 
-            return {
-                  accessToken,
-                  refreshToken,
-                  user: userDto
-            }
-      }
+    await TokenService.saveToken(userDto.id, tokens.refreshToken);
 
-      public login = async (email: string, password: string) => {
-            const userData = await UserModel.findOne({email});
+    return {
+      ...tokens,
+      user: userDto,
+    };
+  };
 
-            if(!userData) {
-                  throw ApiErrors.BadRequest(`User: ${email} is not authorized`);
-            }
+  public login = async (email: string, password: string) => {
+    const userData = await UserModel.findOne({ email });
 
-            const isPassValid = bcrypt.compareSync(password, userData.password);
+    if (!userData) throw ApiErrors.BadRequest(`User: ${email} is not found :-(`);
 
-      }
+    const isPassValid = bcrypt.compareSync(password, userData.password);
 
-      public activate = async (link: string) => {
-            const user = await UserModel.findOne({activationLink: link});
+    if (!isPassValid) throw ApiErrors.BadRequest('Wrong password!');
 
-            if(!user) throw ApiErrors.BadRequest('Invalid activation link');
+    //     if (!userData.isActivated) throw ApiErrors.UnauthorizedError('Check you email for activation link');
 
-            user.isActivated = true;
+    const userDto = new UserDto(userData);
+    const tokens = TokenService.generateTokens({ ...userDto });
+    await TokenService.saveToken(userDto.id, tokens.refreshToken);
 
-            await user.save();
-      }
+    return {
+      ...tokens,
+      user: userDto,
+    };
+  };
 
+  public activate = async (link: string) => {
+    const user = await UserModel.findOne({ activationLink: link });
+
+    if (!user) throw ApiErrors.BadRequest('Invalid activation link');
+
+    user.isActivated = true;
+
+    await user.save();
+  };
 }
 
 export default new UserService();

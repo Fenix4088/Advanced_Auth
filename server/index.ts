@@ -23,7 +23,6 @@ app.use('/api', router);
 //! add custom error handler middleware as the last middleware
 app.use(errorMiddleware);
 
-
 const startApp = async () => {
   try {
     mongoose.connect(`${DB}`, (err) => {

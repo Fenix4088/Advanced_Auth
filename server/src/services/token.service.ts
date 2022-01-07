@@ -6,43 +6,46 @@ import { IGenerateTokensPayload, ITokenModel } from '../types/token.type';
 
 dotenv.config();
 interface IGenerateTokenReturn {
-      accessToken: string;
-      refreshToken: string;  
+  accessToken: string;
+  refreshToken: string;
 }
 
-
 interface ITokenService {
-      generateTokens(payload: IGenerateTokensPayload): IGenerateTokenReturn;
-      saveToken(userId: Types.ObjectId, refreshToken: string): Promise<Document<any, any, ITokenModel> & ITokenModel & {
-            _id: Types.ObjectId;
-        }>
+  generateTokens(payload: IGenerateTokensPayload): IGenerateTokenReturn;
+  saveToken(
+    userId: Types.ObjectId,
+    refreshToken: string
+  ): Promise<
+    Document<any, any, ITokenModel> &
+      ITokenModel & {
+        _id: Types.ObjectId;
+      }
+  >;
 }
 
 class TokenService implements ITokenService {
+  public generateTokens = (payload: IGenerateTokensPayload) => {
+    const accessToken = jwt.sign(payload, process.env.SECRET_KEY || 'secret', { expiresIn: '30m', algorithm: 'HS256' });
+    const refreshToken = jwt.sign(payload, process.env.SECRET_KEY_REFRESH || 'secret-refresh', { expiresIn: '30d', algorithm: 'HS256' });
 
-      public generateTokens = (payload: IGenerateTokensPayload) => {
-            const accessToken = jwt.sign(payload, process.env.SECRET_KEY || 'secret', {expiresIn: '30m', algorithm: 'HS256'});
-            const refreshToken = jwt.sign(payload, process.env.SECRET_KEY_REFRESH || 'secret-refresh', {expiresIn: '30d', algorithm: 'HS256'});
+    return {
+      accessToken,
+      refreshToken,
+    };
+  };
 
-            return {
-                  accessToken,
-                  refreshToken
-            }
-      }
+  public saveToken = async (userId: Types.ObjectId, refreshToken: string) => {
+    const token = await TokenModel.findOne({ user: userId });
 
-      public saveToken = async (userId: Types.ObjectId, refreshToken: string) => {
-            const token = await TokenModel.findOne({user: userId});
+    if (token) {
+      token.refreshToken = refreshToken;
+      return token.save();
+    }
 
-            if(token) {
-                  token.refreshToken = refreshToken;
-                  return token.save();
-            }
+    const newToken = await TokenModel.create({ user: userId, refreshToken });
 
-            const newToken = await TokenModel.create({user: userId, refreshToken});
-
-            return newToken;
-      }
-
+    return newToken;
+  };
 }
 
 export default new TokenService();
