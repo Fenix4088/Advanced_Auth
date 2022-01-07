@@ -1,3 +1,4 @@
+import { DocumentedObject } from './../types/common';
 import { Types, Document } from 'mongoose';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
@@ -12,15 +13,8 @@ interface IGenerateTokenReturn {
 
 interface ITokenService {
   generateTokens(payload: IGenerateTokensPayload): IGenerateTokenReturn;
-  saveToken(
-    userId: Types.ObjectId,
-    refreshToken: string
-  ): Promise<
-    Document<any, any, ITokenModel> &
-      ITokenModel & {
-        _id: Types.ObjectId;
-      }
-  >;
+  saveToken(userId: Types.ObjectId, refreshToken: string): Promise<DocumentedObject<ITokenModel>>;
+  removeToken(refreshToken: string): Promise<DocumentedObject<ITokenModel> | null>;
 }
 
 class TokenService implements ITokenService {
@@ -45,6 +39,10 @@ class TokenService implements ITokenService {
     const newToken = await TokenModel.create({ user: userId, refreshToken });
 
     return newToken;
+  };
+
+  public removeToken = async (refreshToken: string) => {
+    return await TokenModel.findOneAndDelete({ refreshToken });
   };
 }
 

@@ -52,8 +52,14 @@ class UserController implements IUserController {
     }
   };
 
-  public logout = (req: TRequest<{}, {}, {}>, res: Response, next: NextFunction) => {
+  public logout = async (req: TRequest<{}, {}, {}>, res: Response, next: NextFunction) => {
     try {
+      const { refreshToken } = req.cookies;
+
+      const token = await UserService.logout(refreshToken);
+
+      res.clearCookie('refreshToken');
+      return res.status(200).json({ message: 'Bue bue, my friend! ;-)', token });
     } catch (error) {
       next(error);
     }

@@ -1,3 +1,5 @@
+import { ITokenModel } from './../types/token.type';
+import { DocumentedObject } from './../types/common';
 import { IGenerateTokensPayload } from '../types/token.type';
 import UserModel from '../models/user.model';
 import MailService from './mail.service';
@@ -6,6 +8,7 @@ import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { UserDto } from '../dtos/user.dto';
 import { ApiErrors } from '../exceptions/api.errors';
+import TokenModel from '../models/token.model';
 
 interface IRegistrationReturn {
   accessToken: string;
@@ -16,6 +19,7 @@ interface IRegistrationReturn {
 interface IUserService {
   registration(email: string, password: string): Promise<IRegistrationReturn>;
   login(email: string, password: string): Promise<IRegistrationReturn>;
+  logout(refreshToken: string): Promise<DocumentedObject<ITokenModel>>;
   activate(link: string): void;
 }
 
@@ -62,6 +66,14 @@ class UserService implements IUserService {
       ...tokens,
       user: userDto,
     };
+  };
+
+  public logout = async (refreshToken: string) => {
+    const token = await TokenService.removeToken(refreshToken);
+
+    if(!token) throw ApiErrors.BadRequest('Oops, you cant logout');
+
+    return token;
   };
 
   public activate = async (link: string) => {
