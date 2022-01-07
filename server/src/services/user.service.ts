@@ -8,7 +8,9 @@ import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { UserDto } from '../dtos/user.dto';
 import { ApiErrors } from '../exceptions/api.errors';
-import TokenModel from '../models/token.model';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
 interface IRegistrationReturn {
   accessToken: string;
@@ -20,7 +22,8 @@ interface IUserService {
   registration(email: string, password: string): Promise<IRegistrationReturn>;
   login(email: string, password: string): Promise<IRegistrationReturn>;
   logout(refreshToken: string): Promise<DocumentedObject<ITokenModel>>;
-  activate(link: string): void;
+  refresh(refreshToken: string): Promise<any>;
+  activate(link: string): Promise<void>;
 }
 
 class UserService implements IUserService {
@@ -71,9 +74,35 @@ class UserService implements IUserService {
   public logout = async (refreshToken: string) => {
     const token = await TokenService.removeToken(refreshToken);
 
-    if(!token) throw ApiErrors.BadRequest('Oops, you cant logout');
+    if (!token) throw ApiErrors.BadRequest('Oops, you cant logout');
 
     return token;
+  };
+
+  public refresh = async (refreshToken: string) => {
+
+      if(!refreshToken) throw ApiErrors.UnauthorizedError();
+
+      const userData = TokenService.validateRefreshToken(refreshToken);
+      const tokenFromDB = await TokenService.findToken(refreshToken);
+
+      if(!userData || !tokenFromDB) throw ApiErrors.UnauthorizedError();
+
+      if(typeof userData === 'string') throw ApiErrors.UnauthorizedError();
+
+      const user = await UserModel.findById(userData.id);
+
+      if(!user) throw ApiErrors.UnauthorizedError();
+
+      const userDto = new UserDto(user);
+      const tokens = TokenService.generateTokens({ ...userDto });
+      await TokenService.saveToken(userDto.id, tokens.refreshToken);
+  
+      return {
+        ...tokens,
+        user: userDto,
+      };
+
   };
 
   public activate = async (link: string) => {

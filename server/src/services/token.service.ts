@@ -15,6 +15,9 @@ interface ITokenService {
   generateTokens(payload: IGenerateTokensPayload): IGenerateTokenReturn;
   saveToken(userId: Types.ObjectId, refreshToken: string): Promise<DocumentedObject<ITokenModel>>;
   removeToken(refreshToken: string): Promise<DocumentedObject<ITokenModel> | null>;
+  validateAccessToken(token: string): string | jwt.JwtPayload  | null;
+  validateRefreshToken(token: string): string | jwt.JwtPayload | null;
+  findToken(token: string): Promise<DocumentedObject<ITokenModel> | null>;
 }
 
 class TokenService implements ITokenService {
@@ -43,6 +46,29 @@ class TokenService implements ITokenService {
 
   public removeToken = async (refreshToken: string) => {
     return await TokenModel.findOneAndDelete({ refreshToken });
+  };
+
+  public validateAccessToken =  (token: string) => {
+    try {
+      const userData = jwt.verify(token, process.env.SECRET_KEY || '');
+      if(!userData) throw new Error();
+      return userData;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  public validateRefreshToken = (token: string) => {
+    try {
+      const userData = jwt.verify(token, process.env.SECRET_KEY_REFRESH || '');
+      return userData;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  public findToken = async (refreshToken: string) => {
+      return await TokenModel.findOne({refreshToken});
   };
 }
 

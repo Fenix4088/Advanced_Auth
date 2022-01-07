@@ -76,8 +76,14 @@ class UserController implements IUserController {
     }
   };
 
-  public refresh = (req: TRequest<{}, {}, {}>, res: Response, next: NextFunction) => {
+  public refresh = async (req: TRequest<{}, {}, {}>, res: Response, next: NextFunction) => {
     try {
+      const { refreshToken } = req.cookies;
+
+      const userData = await UserService.refresh(refreshToken);
+
+      res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+      return res.status(200).json({ message: `Token refreshed!`, data: userData });
     } catch (error) {
       next(error);
     }
