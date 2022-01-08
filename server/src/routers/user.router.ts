@@ -1,3 +1,4 @@
+import { authMiddleware } from '../middleware/auth.middleware';
 
 import { Router } from "express";
 import {check} from 'express-validator';
@@ -28,6 +29,6 @@ router.get(ACTIVATE_BY_LINK, (req, res, next) => UserController.activate(req, re
 
 router.get(REFRESH, (req, res, next) => UserController.refresh(req, res, next));
 
-router.get(USERS, (req, res, next) => UserController.getUsers(req, res, next));
+router.get(USERS, authMiddleware,  (req, res, next) => UserController.getUsers(req, res, next));
 
 export default router;
