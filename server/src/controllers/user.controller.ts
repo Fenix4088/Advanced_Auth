@@ -1,3 +1,4 @@
+import { UserDto } from './../dtos/user.dto';
 import { RerquestExpressValidator } from './../types/common';
 import { IUserActivationReqParams } from './../types/user.type';
 import { NextFunction } from 'express-serve-static-core';
@@ -89,9 +90,11 @@ class UserController implements IUserController {
     }
   };
 
-  public getUsers = (req: TRequest<{}, {}, {}>, res: Response, next: NextFunction) => {
+  public getUsers = async (req: TRequest<{}, {}, {}>, res: Response, next: NextFunction) => {
     try {
-      return res.status(200).json({ message: 'Server in work' });
+      const users = await UserService.getAllUsers();
+      const allUsersDTO = users.map(u => ({...new UserDto(u)}))
+      return res.status(200).json(allUsersDTO);
     } catch (error) {
       next(error);
     }

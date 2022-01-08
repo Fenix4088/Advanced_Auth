@@ -25,6 +25,7 @@ router.post(LOGIN, (req, res, next) => UserController.login(req, res, next));
 router.post(LOGOUT, (req, res, next) => UserController.logout(req, res, next));
 
 router.get(ACTIVATE_BY_LINK, (req, res, next) => UserController.activate(req, res, next)); 
+
 router.get(REFRESH, (req, res, next) => UserController.refresh(req, res, next));
 
 router.get(USERS, (req, res, next) => UserController.getUsers(req, res, next));

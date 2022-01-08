@@ -1,3 +1,4 @@
+import { IUserModel } from './../types/user.type';
 import { ITokenModel } from './../types/token.type';
 import { DocumentedObject } from './../types/common';
 import { IGenerateTokensPayload } from '../types/token.type';
@@ -8,7 +9,6 @@ import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { UserDto } from '../dtos/user.dto';
 import { ApiErrors } from '../exceptions/api.errors';
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -24,6 +24,7 @@ interface IUserService {
   logout(refreshToken: string): Promise<DocumentedObject<ITokenModel>>;
   refresh(refreshToken: string): Promise<any>;
   activate(link: string): Promise<void>;
+  getAllUsers(): Promise<DocumentedObject<IUserModel>[]>;
 }
 
 class UserService implements IUserService {
@@ -114,6 +115,12 @@ class UserService implements IUserService {
 
     await user.save();
   };
+
+  public getAllUsers = async () => {
+    const users = await UserModel.find();
+    return users;
+  };
+
 }
 
 export default new UserService();
